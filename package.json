@@ -1,0 +1,47 @@
+{
+  "name": "swachh-fleet-world",
+  "private": true,
+  "version": "0.0.0",
+  "description": "KasaFlow Bengaluru: a 3D living-world simulation of smart solid-waste collection for a real Bengaluru ward cluster, in one offline HTML file",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.pure.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:perf": "vitest run --config vitest.perf.config.ts",
+    "test:e2e": "vite build --mode test && playwright test",
+    "data:fetch": "tsx scripts/data/fetch-snapshot.ts",
+    "check": "npm run lint && npm run typecheck && npm run test"
+  },
+  "dependencies": {
+    "@preact/signals": "2.11.3",
+    "preact": "11.0.1",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.0",
+    "@preact/preset-vite": "2.10.6",
+    "@types/node": "26.6.5",
+    "@types/three": "0.186.0",
+    "@vitest/coverage-v8": "5.0.3",
+    "@xmldom/xmldom": "0.9.12",
+    "eslint": "10.12.0",
+    "fast-check": "4.10.2",
+    "globals": "17.13.0",
+    "proj4": "2.22.0",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.1",
+    "vite": "8.3.4",
+    "vite-plugin-singlefile": "2.3.3",
+    "vitest": "5.0.3"
+  }
+}

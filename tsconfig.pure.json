@@ -1,0 +1,9 @@
+{
+  // AD-2: the pure layers compile without the DOM lib or any ambient types, so DOM globals cannot even type-check there.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": []
+  },
+  "include": ["src/shared", "src/config", "src/geo", "src/routing", "src/sim", "src/lab"]
+}
