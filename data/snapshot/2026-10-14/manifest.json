@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "fetchedAt": "2026-10-14",
+  "licence": "ODbL-1.0",
+  "attribution": "© OpenStreetMap contributors",
+  "origin": {
+    "zone": 43,
+    "easting": 785672,
+    "northing": 1429471
+  },
+  "bboxes": [
+    [
+      12.887584094622929,
+      77.6050312714573,
+      12.917420017337399,
+      77.63263821928325
+    ],
+    [
+      12.887584094622929,
+      77.63263821928325,
+      12.917420017337399,
+      77.6602451671092
+    ],
+    [
+      12.917420017337399,
+      77.6050312714573,
+      12.947255940051871,
+      77.63263821928325
+    ],
+    [
+      12.917420017337399,
+      77.63263821928325,
+      12.947255940051871,
+      77.6602451671092
+    ]
+  ],
+  "endpoints": [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter"
+  ],
+  "queries": [
+    "[out:json][timeout:180];way[\"highway\"~\"^(trunk|primary|secondary|tertiary|unclassified|residential|living_street|service)(_link)?$\"][\"area\"!=\"yes\"][\"access\"!~\"^(private|no)$\"](12.887584,77.605031,12.917420,77.632638);out body qt;>;out skel qt;",
+    "[out:json][timeout:180];way[\"highway\"~\"^(trunk|primary|secondary|tertiary|unclassified|residential|living_street|service)(_link)?$\"][\"area\"!=\"yes\"][\"access\"!~\"^(private|no)$\"](12.887584,77.632638,12.917420,77.660245);out body qt;>;out skel qt;",
+    "[out:json][timeout:180];way[\"highway\"~\"^(trunk|primary|secondary|tertiary|unclassified|residential|living_street|service)(_link)?$\"][\"area\"!=\"yes\"][\"access\"!~\"^(private|no)$\"](12.917420,77.605031,12.947256,77.632638);out body qt;>;out skel qt;",
+    "[out:json][timeout:180];way[\"highway\"~\"^(trunk|primary|secondary|tertiary|unclassified|residential|living_street|service)(_link)?$\"][\"area\"!=\"yes\"][\"access\"!~\"^(private|no)$\"](12.917420,77.632638,12.947256,77.660245);out body qt;>;out skel qt;",
+    "[out:json][timeout:180];way[\"building\"](12.887584,77.605031,12.917420,77.632638);out tags geom qt;",
+    "[out:json][timeout:180];way[\"building\"](12.887584,77.632638,12.917420,77.660245);out tags geom qt;",
+    "[out:json][timeout:180];way[\"building\"](12.917420,77.605031,12.947256,77.632638);out tags geom qt;",
+    "[out:json][timeout:180];way[\"building\"](12.917420,77.632638,12.947256,77.660245);out tags geom qt;",
+    "[out:json][timeout:180];(way[\"natural\"=\"water\"](12.887584,77.605031,12.917420,77.632638);relation[\"natural\"=\"water\"](12.887584,77.605031,12.917420,77.632638);way[\"leisure\"=\"park\"](12.887584,77.605031,12.917420,77.632638);relation[\"leisure\"=\"park\"](12.887584,77.605031,12.917420,77.632638););out tags geom qt;",
+    "[out:json][timeout:180];(way[\"natural\"=\"water\"](12.887584,77.632638,12.917420,77.660245);relation[\"natural\"=\"water\"](12.887584,77.632638,12.917420,77.660245);way[\"leisure\"=\"park\"](12.887584,77.632638,12.917420,77.660245);relation[\"leisure\"=\"park\"](12.887584,77.632638,12.917420,77.660245););out tags geom qt;",
+    "[out:json][timeout:180];(way[\"natural\"=\"water\"](12.917420,77.605031,12.947256,77.632638);relation[\"natural\"=\"water\"](12.917420,77.605031,12.947256,77.632638);way[\"leisure\"=\"park\"](12.917420,77.605031,12.947256,77.632638);relation[\"leisure\"=\"park\"](12.917420,77.605031,12.947256,77.632638););out tags geom qt;",
+    "[out:json][timeout:180];(way[\"natural\"=\"water\"](12.917420,77.632638,12.947256,77.660245);relation[\"natural\"=\"water\"](12.917420,77.632638,12.947256,77.660245);way[\"leisure\"=\"park\"](12.917420,77.632638,12.947256,77.660245);relation[\"leisure\"=\"park\"](12.917420,77.632638,12.947256,77.660245););out tags geom qt;",
+    "[out:json][timeout:180];(nwr[\"amenity\"=\"recycling\"][\"recycling_type\"=\"centre\"](12.887584,77.605031,12.917420,77.632638);nwr[\"amenity\"=\"marketplace\"](12.887584,77.605031,12.917420,77.632638);node[\"place\"~\"^(suburb|neighbourhood|quarter)$\"](12.887584,77.605031,12.917420,77.632638);node[\"shop\"](12.887584,77.605031,12.917420,77.632638);way(287327441););out tags center qt;",
+    "[out:json][timeout:180];(nwr[\"amenity\"=\"recycling\"][\"recycling_type\"=\"centre\"](12.887584,77.632638,12.917420,77.660245);nwr[\"amenity\"=\"marketplace\"](12.887584,77.632638,12.917420,77.660245);node[\"place\"~\"^(suburb|neighbourhood|quarter)$\"](12.887584,77.632638,12.917420,77.660245);node[\"shop\"](12.887584,77.632638,12.917420,77.660245);way(287327441););out tags center qt;",
+    "[out:json][timeout:180];(nwr[\"amenity\"=\"recycling\"][\"recycling_type\"=\"centre\"](12.917420,77.605031,12.947256,77.632638);nwr[\"amenity\"=\"marketplace\"](12.917420,77.605031,12.947256,77.632638);node[\"place\"~\"^(suburb|neighbourhood|quarter)$\"](12.917420,77.605031,12.947256,77.632638);node[\"shop\"](12.917420,77.605031,12.947256,77.632638);way(287327441););out tags center qt;",
+    "[out:json][timeout:180];(nwr[\"amenity\"=\"recycling\"][\"recycling_type\"=\"centre\"](12.917420,77.632638,12.947256,77.660245);nwr[\"amenity\"=\"marketplace\"](12.917420,77.632638,12.947256,77.660245);node[\"place\"~\"^(suburb|neighbourhood|quarter)$\"](12.917420,77.632638,12.947256,77.660245);node[\"shop\"](12.917420,77.632638,12.947256,77.660245);way(287327441););out tags center qt;"
+  ],
+  "wards": [
+    {
+      "key": "South-29",
+      "name": "Kormangala West",
+      "population2011": 27879
+    },
+    {
+      "key": "South-28",
+      "name": "Kormangala East",
+      "population2011": 22885
+    },
+    {
+      "key": "South-30",
+      "name": "Jakkasandra",
+      "population2011": 25594
+    },
+    {
+      "key": "South-72",
+      "name": "HSR Layout",
+      "population2011": 18787
+    },
+    {
+      "key": "South-71",
+      "name": "Agara",
+      "population2011": 18836
+    },
+    {
+      "key": "South-68",
+      "name": "Mangammana Palya",
+      "population2011": 23783
+    },
+    {
+      "key": "South-69",
+      "name": "Hosapalya",
+      "population2011": 18834
+    }
+  ],
+  "counts": {
+    "buildings": 26199,
+    "roadNodes": 10753,
+    "roadWays": 3460,
+    "areas": 126,
+    "pois": 860
+  },
+  "coverage": {
+    "buildingsWithLevelsPct": 1.1,
+    "sparseWards": [
+      "South-69"
+    ]
+  },
+  "files": {
+    "roads.bin": {
+      "sha256": "2e491f32883253bb2b6744d8514c346d467b3d042c8316513b573c7cc29d95b7",
+      "bytes": 302925
+    },
+    "buildings.bin": {
+      "sha256": "de547a97a37e69aa1eae15f173301c39749dc0a52c7f23aba3e93eb5358981ba",
+      "bytes": 752328
+    },
+    "areas.bin": {
+      "sha256": "6715012c8bf261ed739564c3e3b97f9ca9b008ac2f063106ea9f32a25106407f",
+      "bytes": 5242
+    },
+    "wards.json": {
+      "sha256": "b7a19af12feff25fc764754d4f6cc720bd3a02050f4ced91b6598bab11ddedde",
+      "bytes": 8439
+    },
+    "pois.json": {
+      "sha256": "7a518e189dd27384a353b6900a57718d307e6bc12a70bd15bfc38186dcc66f3c",
+      "bytes": 69459
+    }
+  }
+}

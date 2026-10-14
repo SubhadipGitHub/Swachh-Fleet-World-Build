@@ -3,6 +3,10 @@
 > Status: **APPROVED 2026-10-14** (Stage 1: Plan & Elicit). Every **(default)** below was accepted as proposed,
 > and the open questions in §13 were settled on their defaults. Stage 2 then confirmed the exact ward list (D1) and
 > corrected the population basis (W-5). Both are marked *Stage 2 update*.
+> **Change requests after M2 (2026-10-14):** CR-1 stops drawing buildings and CR-2 adds floating 3D place labels.
+> Both are listed in §15 and marked *CR-n* where they change a requirement.
+> **M3 (dynamic routing): complete and approved 2026-10-14** (§4 "M3: Dynamic routing"; results in architecture
+> §10.10).
 > Source: the brief "Smart Solid Waste Management & Fleet Logistics (Swachh Bharat Urban Fleets)", the 5-block
 > World Prompt Pack template, the decisions in §1, and the research in `docs/data-sources.md`.
 
@@ -11,13 +15,13 @@
 | # | Decision | Choice |
 |---|----------|--------|
 | D1 | Place | **A real Bengaluru ward cluster.** HSR Layout + Koramangala + Agara, with the real KCDC compost plant at Kudlu Gate on the south-east edge. *Stage 2 update:* the exact cluster is **7 contiguous wards of the Bengaluru South City Corporation** (GBA 2025 delimitation): 29 Kormangala West, 28 Kormangala East, 30 Jakkasandra, 72 HSR Layout, 71 Agara, 68 Mangammana Palya and 69 Hosapalya (which contains KCDC). Total **11.92 km²**. Ward names keep the official spelling ("Kormangala"). |
-| D2 | Map fidelity | **Real OpenStreetMap streets and building footprints**, baked into the file as a dated snapshot and drawn in the toy-like clay style. Route distances are real-world metres. |
+| D2 | Map fidelity | **Real OpenStreetMap streets and building footprints**, baked into the file as a dated snapshot. Streets, water and parks are drawn in the toy-like clay style. Route distances are real-world metres. *CR-1:* buildings are not drawn; their footprints still size the households. |
 | D3 | Scenarios | **All four families:** static vs dynamic routing (the headline), fleet disruptions, seasonal and festival surges, infrastructure changes (§7). |
 | D4 | Codebase | **Fresh from scratch** in a new repo, `Swachh-Fleet-World`. Same workflow as World-Builder, no shared code. |
 | D5 | Stack | (default) **TypeScript (strict), Vite, Three.js, Preact + signals, Vitest, Playwright**, bundled by `vite-plugin-singlefile` into **one offline `index.html`**. |
 | D6 | Real vs simulated | **Real geography and real published calibration figures; synthetic live streams.** No public live bin-sensor or truck-GPS feed exists, so sensor readings, GPS tracks and attendance are simulated, calibrated to real figures, and always labelled "Simulated" (§8). A later milestone adds import of real feeds (§9). |
 | D7 | Bengaluru's actual collection model | (default) **Model what Bengaluru really does**, with smart bins as the intervention. Collection is **door-to-door by auto-tippers** (about 1 per 1,000 households), which hand waste to **compactors at secondary transfer points**, which haul to **processing (KCDC) or the landfill**. Black spots (garbage vulnerable points) form where streets are skipped or waste is dumped. **Ultrasonic sensors** sit on market and commercial bins, transfer-point containers and known black spots, not on every street (Bengaluru has resisted community bins). See O-3. |
-| D8 | Comparison method | (default) **Shadow twin.** A second, invisible simulation with the same seed runs the baseline (static routes, no scenario), and the KPI cards show live deltas against it. |
+| D8 | Comparison method | (default) **Shadow twin.** A second, invisible simulation with the same seed runs the baseline (static routes, no scenario), and the KPI cards show live deltas against it. *M3 update (M3-2):* the twin runs Static under the same conditions as the live world (weather, absences, breakdowns), so deltas isolate the routing policy. |
 | D9 | Branding | (default) Working product name **"KasaFlow Bengaluru"** (*kasa* is Kannada for garbage). Real places and agencies (GBA, BSWML, KCDC) appear as facts. **No government, GBA, BSWML or Swachh Bharat logos or emblems.** A permanent "Independent simulation, not an official system" note is shown. See O-1. |
 | D10 | Theme | (default) **Dark first** (graphite #1C1F22) with a light toggle. One accent: **civic green #22A86B**. |
 
@@ -62,13 +66,15 @@ students and the press. Every figure says whether it is real, derived, assumed o
   (roads with class, one-way and lanes; building footprints with heights or levels where tagged; water; parks;
   named places), projects it to local metres (UTM zone 43N), simplifies it, and writes a dated, committed snapshot.
   The build bundles that snapshot and never calls the network.
-- **W-2 Clay style on real geometry.** Buildings are extruded footprints. Where height is missing it is derived
-  from the building type, labelled `assumed`. The style is low-poly and toy-like, with soft shadows and one accent.
-  Roads are drawn by class (arterial, collector, residential lane). Lakes and parks come from OSM.
+- **W-2 Clay style on real geometry.** The style is low-poly and toy-like, with soft shadows and one accent. Roads
+  are drawn by class (arterial, collector, residential lane). Lakes and parks come from OSM. *CR-1:* buildings are
+  **not drawn**. Their footprints and levels stay in the snapshot because they set how many households each street
+  serves; where a height is missing it is derived from the building type, labelled `assumed`.
 - **W-3 Facilities.** KCDC, the weighbridge, the depot, the DWCC and the transfer points are placed at real
   coordinates where known. Otherwise they go at plausible sites marked "Location assumed" in their detail panel.
 - **W-4 Wards.** Ward boundaries are drawn as soft outlines with ward names and numbers, from the GBA 2025
   delimitation if a boundary file is available (otherwise the newest public file, labelled with its date).
+  *CR-2:* the names are floating 3D labels (W-8).
 - **W-5 Scale (derived, defaults).** All configurable, all tagged in `docs/data-sources.md`:
 
   *Stage 2 update:* the Census 2011 population of the 7 wards is **1,56,598** (`real`, from the delimitation
@@ -89,9 +95,15 @@ students and the press. Every figure says whether it is real, derived, assumed o
   | Smart bins (markets, commercial streets) | 120 | `assumed`, a scenario lever |
   | Black spots | ~28 known | 1,555 city-wide scaled by population share (`derived`) |
 
-- **W-6 Instancing.** Repeated objects (buildings per style batch, trees, bins, people, vehicles) use instancing or
-  merged geometry to stay within the draw-call budget (N-2).
+- **W-6 Instancing.** Repeated objects (trees, bins, people, vehicles) use instancing or merged geometry to stay
+  within the draw-call budget (N-2).
 - **W-7 Attribution.** "© OpenStreetMap contributors" is visible on the map at all times, with a link to the ODbL.
+- **W-8 Floating place labels (CR-2).** Place names are signs in the 3D world, not flat text on the screen: a card
+  floating above the place on a thin pin to the ground, always facing the camera, larger when nearer, gently bobbing
+  (still when the browser asks for reduced motion), and hidden behind anything nearer. Three groups, shown by zoom:
+  **area names** (HSR Layout, Koramangala) when zoomed out to the whole cluster, **ward names** ("South-72 · HSR
+  Layout") at the middle zoom, and **facility names** (the transfer points and KCDC Kudlu Gate) when zoomed in.
+  Labels never block clicks on the map.
 
 ### M1: Block 2, LIFE (simulation)
 - **L-1 Daily cycle.** The simulated day (IST) runs:
@@ -138,15 +150,93 @@ students and the press. Every figure says whether it is real, derived, assumed o
   | Winter haze | Low-contrast haze, soft light | Speeds −10% in early morning |
   | Heatwave | Warm grade, shimmer | Wet waste must be collected within 24 h (overflow threshold tightened); odour complaints rise faster at black spots |
 
-- **X-2 Day and night** from real sunrise and sunset for Bengaluru on the simulated date. At night: street lights, vehicle lights, lit windows; night clearance runs at black spots.
+- **X-2 Day and night** from real sunrise and sunset for Bengaluru on the simulated date. At night: street lights and vehicle lights (lit windows went with the buildings, CR-1); night clearance runs at black spots.
 - **X-3** Mobile: touch gestures, and panels collapse to a bottom sheet.
 - **X-4** Theme toggle (dark default, light), remembered per browser. A failure to save it is harmless.
+
+### M3: Dynamic routing (approved 2026-10-14)
+Decided by the user on 2026-10-14: the baseline is **calibrated to the real collection figure** before any comparison;
+the twin runs **Static under the same conditions**; Dynamic controls **auto-tipper beats, compactor dispatch and
+black-spot crews** (smart bins keep their static service); fuel per tonne is **per tonne collected**. Items marked
+(default) are proposals to approve or change.
+
+- **M3-1 Policy switch.** The top bar's policy badge becomes a Static / Dynamic switch. The page opens on Static.
+  (default) Switching mid-day re-plans the rest of today at once: vehicles finish the street segment or stop they
+  are on, then follow the new plan. Switching back to Static restores today's fixed beats for the remaining work.
+- **M3-2 Twin = Static, same conditions.** The shadow twin always runs Static under the **same weather, absences,
+  breakdowns, sensor faults and waste generation** as the live world, so the KPI deltas show the routing policy's
+  effect alone. This replaces D8's "no scenario" and M2's clear-weather twin: in M3, weather by itself no longer
+  produces a delta (the X-1 end-to-end test changes accordingly).
+- **M3-3 Baseline calibration.** Before Dynamic results are shown, the Static baseline is tuned so that its
+  steady-state share of **generated waste collected** sits in the **50–60% band** (the B.PAC 2023 "< 60% collected"
+  figure, `real`). Steady state means days 3–7 over 5 seeds, in clear weather. Only `assumed` knobs are tuned (skips,
+  early returns, route deviations, breakdowns, black-spot dumping); `real` and `derived` figures such as the 5%
+  absence rate stay fixed. Tuned values become `derived (calibrated)` in `docs/data-sources.md`, with the method and
+  the target. A test fails if the baseline leaves the band.
+  - (default) **Where uncollected waste goes.** Waste left uncollected for over 48 h on a segment is dumped at the
+    nearest black spot (which can activate it). A share of the rest leaves the system each day (informal
+    collection, burning), so the backlog cannot grow without bound. That share is `assumed`, and set by the
+    calibration.
+- **M3-4 Forecasts use only what an operator would know.** The Dynamic policy sees only what an operator would have:
+  sensor readings (with their noise, stuck sensors and offline gaps), past service records from GPS, and the
+  calendar. It never sees the generator's true rates (risk R-4).
+  - (default) Sensored points (transfer-point containers, black spots, market and commercial bins) are forecast
+    from an hour-of-week profile learned from past readings by exponential smoothing. With less than a day of
+    history, the M2 two-point line is used.
+  - Street segments have no sensors. Their backlog is estimated as households × the profile rate × the time since
+    they were last served.
+  - Forecast error (mean absolute error) is measured live and shown in the Data sources dialog.
+- **M3-5 Dynamic auto-tipper beats.** At 05:30 IST the beats are re-balanced across the tippers actually present,
+  serving streets in order of predicted backlog and time since last service, within payload, shift and
+  transfer-point limits.
+  - **R-5 fairness:** no segment goes more than 48 h unserved.
+  - **Mid-day re-plans** happen only on incidents: a breakdown (the orphaned beat is shared out), a road closure
+    (re-routing around it) or a mid-day policy switch.
+  - **Deferring streets.** A street may be deferred to tomorrow only when its predicted backlog is low and the
+    fairness limit allows it. Each deferral is recorded with its reason.
+- **M3-6 Dynamic compactor dispatch.** Compactors go to a transfer point when its container is predicted to reach
+  (default) **80%** by their arrival, instead of on a fixed schedule. They respect shift windows and the KCDC intake
+  cap: when the cap is predicted to be hit, loads go to the landfill (already modelled), and dispatch is ordered to
+  keep diversions to a minimum.
+- **M3-7 Dynamic clearance crews.** Black spots are cleared in order of a risk score: size, growth rate, backlog on
+  nearby streets, and heatwave. The night window (M2-7, 19:00–21:00) stays. (default) A spot above the critical
+  size can also be dispatched in daytime.
+- **M3-8 Smart bins stay static** under both policies. Their sensors still feed forecasts, alerts and the tracker.
+- **M3-9 Solver (R-2).** A deterministic heuristic, with the exact algorithm chosen in Stage 2. Its work budget is
+  counted in **iterations, not wall-clock time**, so a run replays identically on any machine.
+  - It runs off the main thread, and the 3D view keeps its frame rate while it solves.
+  - Simulated time does not pass while a plan is being made, so the result never depends on machine speed.
+  - If a solve fails, today falls back to the static beats and an alert says so.
+- **M3-10 Explainability (R-4).**
+  - For a Dynamic route, the detail panel lists each stop or street with why it is there: predicted backlog or
+    fill, hours since last served, and risk.
+  - It also lists deferred or dropped work with the reason: capacity, shift end, road closed, or low backlog within
+    the fairness limit.
+  - A vehicle's detail shows its re-plans ("Re-planned 08:42 · breakdown of AT-HSR-031").
+  - The Routes table gains Policy and Re-plans columns, and a new info alert says "Re-planned: reason".
+- **M3-11 Objective weights (R-3).** The defaults are fixed in M3, listed in the Data sources dialog as `assumed`,
+  and become editable in the M4 lab.
+- **M3-12 Fuel per tonne = per tonne collected.** K-2 changes to fleet litres today ÷ tonnes collected today. This
+  resolves the M2 open question, and the KPI-table wording in §3 already matches.
+- **M3-13 Performance.** The 05:30 plan for about 70 vehicles takes (default) at most **2 s** of real time on a
+  mid-range laptop. Re-plans take at most 0.5 s. The view stays at 60 fps throughout, and "skip to" across 05:30
+  still works.
+
+**M3 edge cases (expected behaviour):**
+- All tippers in a ward are absent: neighbouring tippers absorb what payload and shift allow, and the rest is
+  deferred with reasons.
+- A closure cuts off a street: it is deferred as "unreachable (road closed)".
+- KCDC is at its cap: the dispatcher sends loads to the landfill and an alert fires.
+- Day 1 has no history: the forecasts fall back as in M3-4.
+- An offline sensor: the profile forecast is used, and the explanation marks it as low confidence.
+- The policy is switched several times in a minute: each switch re-plans once from the current state.
+- The solver fails: the static fallback is used and an alert fires.
 
 ## 5. Routing (the core of the brief)
 
 - **R-1 Two policies, same world.**
   - **Static (today's practice).** Fixed beats and compactor schedules, generated once from the street network and kept identical every day.
-  - **Dynamic.** At 05:30 IST each simulated day: predict each bin's and segment's fill at its service time, choose which bins and black spots must be served today, re-balance beats across the vehicles actually present, and solve the routes. During the day, re-plan only for incidents (breakdown, road closure, black spot), not continuously.
+  - **Dynamic.** At 05:30 IST each simulated day: predict each segment's backlog and each sensored point's fill at its service time, choose which streets, transfer points and black spots must be served today, re-balance beats across the vehicles actually present, and solve the routes. *M3 scope (M3-5 to M3-8):* auto-tipper beats, compactor dispatch and clearance crews; smart bins stay static. During the day, re-plan only for incidents (breakdown, road closure, black spot), not continuously.
 - **R-2 Solver.** (default) A deterministic heuristic for the capacitated vehicle routing problem with time windows: a construction step (savings or insertion) followed by local search (2-opt, relocate, exchange), with a time budget per solve. Travel times use the time-of-day speed curve on the real road graph, with one-way rules respected. The exact algorithm is chosen in Stage 2.
 - **R-3 Objective** (default weights, configurable): minimise overflow-hours and missed black spots first, then fuel, then km, subject to payload, shift length and transfer-point and KCDC capacity.
 - **R-4 Explainability.** For any route, show why each stop is there (predicted fill, backlog, black-spot risk) and what was dropped and why.
@@ -154,7 +244,7 @@ students and the press. Every figure says whether it is real, derived, assumed o
 
 ## 6. KPIs and metrics (definitions)
 - **K-1 Overflowing points:** sensored bins with true fill ≥ 100% plus active black spots, sampled live; also overflow-hours accumulated today.
-- **K-2 Fuel per tonne:** fleet litres today ÷ tonnes delivered to processing or the landfill today. ₹ uses a configurable diesel and CNG price (`assumed`, with its date).
+- **K-2 Fuel per tonne:** fleet litres today ÷ tonnes **collected** today (*M3-12*; it was "delivered to processing or the landfill" until M2). ₹ uses a configurable diesel and CNG price (`assumed`, with its date).
 - **K-3 On-time coverage:** serviced-in-window ÷ scheduled, over beats, bins and black-spot jobs.
 - **K-4 Secondary metrics** (detail panels and the scenario lab): km driven, empty km (driving with < 20% load), CO₂ (from fuel, using standard emission factors), skipped stops, driver compliance %, transfer-point dwell, KCDC utilisation, landfill diversions, complaints.
 
@@ -196,7 +286,7 @@ runner that simulates N days × M seeds for two configurations in a Web Worker a
 
 ## 10. Non-functional requirements
 - **N-1 Single file, offline.** `npm run build` produces one `dist/index.html` that runs from `file://` with no network access. Size budget (default): ≤ 15 MB including the map snapshot.
-- **N-2 Performance.** 60 fps on a mid-range laptop and ≥ 30 fps on a mid-range phone with ~90 fleet vehicles, ~120 bins, background traffic and the full building set. Draw calls ≤ 200 (laptop) and ≤ 120 (phone). Building detail scales by quality tier.
+- **N-2 Performance.** 60 fps on a mid-range laptop and ≥ 30 fps on a mid-range phone with ~90 fleet vehicles, ~120 bins, background traffic and the place labels. Draw calls ≤ 200 (laptop) and ≤ 120 (phone). Shadows and background traffic scale by quality tier.
 - **N-3 Strictness.** `strict: true`, no `any`; ESLint and typecheck clean.
 - **N-4 Testability.** Simulation and routing have no Three.js or DOM dependencies. The routing solver is tested on small instances with known optima and with property tests (capacity, time windows, every required stop served exactly once).
 - **N-5 Accessibility.** Keyboard-usable panels, WCAG AA contrast (the accent is used only for fills and icons in light mode if it fails AA as text), `prefers-reduced-motion` respected; charts in the lab have table equivalents.
@@ -237,3 +327,13 @@ runner that simulates N days × M seeds for two configurations in a Web Worker a
 - As a **city officer**, I see an alert when a black spot activates, click it, and see which skipped street segments caused it.
 - As a **journalist**, I open the Data sources dialog and see which numbers are real, which are derived and which are simulated.
 - As a **viewer**, I switch to Monsoon at night and see waterlogged roads close, compactors reroute and the KPIs react.
+- *M3:* As a **city officer**, when a tipper breaks down mid-beat under Dynamic, I see an alert, its remaining streets shared out among nearby tippers, and the reason on each affected route.
+- *M3:* As a **planner**, I open a Dynamic route and see why each street is on it and which streets were deferred to tomorrow and why, with none left unserved for more than 48 h.
+- *M3:* As a **journalist**, I see that the Static baseline is calibrated to the real "< 60% collected" figure, and how, before trusting any Dynamic gain.
+
+## 15. Change requests after M2
+
+| # | Date | Change | Affects |
+|---|---|---|---|
+| CR-1 | 2026-10-14 | **Stop drawing buildings.** The map shows streets, water, parks, ward outlines, facilities, bins and vehicles. Building footprints stay in the snapshot for the household model, and the snapshot is unchanged. | D2, W-2, W-6, X-2 (no lit windows), N-2 |
+| CR-2 | 2026-10-14 | **Floating 3D place labels** for areas, wards and facilities, in the "sign card on a pin" style chosen by the user. They replace the flat ward-name text. | W-4, W-8 |

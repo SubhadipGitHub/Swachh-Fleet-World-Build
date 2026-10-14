@@ -17,6 +17,9 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
+      // With noUncheckedIndexedAccess, numeric code over arrays and typed arrays needs `a[i]!` after a bounds-checked
+      // loop; the alternatives (casts or redundant checks in hot loops) are worse (AD-1).
+      '@typescript-eslint/no-non-null-assertion': 'off',
     },
   },
   {

@@ -43,7 +43,21 @@ export function buildTown(): MapData {
       { id: 0, node: node(4, 4), segmentIds: [segments[40]!.id] },
       { id: 1, node: node(1, 4), segmentIds: [segments[12]!.id] },
     ],
+    floodProneSpots: [],
   };
+}
+
+/**
+ * The town with one flood-prone spot at grid node (2, 2): every edge touching that node closes in a monsoon.
+ * Used by the M2 weather tests.
+ */
+export function buildFloodTown(): MapData {
+  const town = buildTown();
+  const g = town.graph;
+  const spotNode = nodeIndex(g, gridNodeId(COLS, 2, 2));
+  const edges: number[] = [];
+  for (let e = 0; e < g.edgeCount; e++) if (g.edgeFrom[e] === spotNode || g.edgeTo[e] === spotNode) edges.push(e);
+  return { ...town, floodProneSpots: [{ id: 0, node: spotNode, edges }] };
 }
 
 export function townConfig(overrides: Partial<WorldConfig> = {}): WorldConfig {
@@ -62,6 +76,7 @@ export function townConfig(overrides: Partial<WorldConfig> = {}): WorldConfig {
     householdKgPerDay: 1.53,
     kcdcIntakeCapKg: 1_000_000,
     blackSpotBaseChancePerHour: 0.002,
+    dieselPriceInrPerL: 89,
     ...overrides,
   };
 }

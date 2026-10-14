@@ -101,3 +101,39 @@ describe('architecture boundaries (AD-2)', () => {
     expect(violations).toEqual([]);
   });
 });
+
+// Architecture M3-D4 (risk R-4): Dynamic decisions see only the operator's view. Planner code never reaches the
+// world's truth (true fills, carried amounts, generator multipliers, condition draws), directly or through any chain.
+const PLANNER_DIRS = ['src/sim/policies', 'src/routing/vrp'];
+const TRUTH_FILES = ['src/sim/world.ts', 'src/sim/map-data.ts', 'src/sim/conditions.ts', 'src/sim/lineage.ts', 'src/sim/movement/', 'src/sim/agents/'];
+
+describe('planner boundary (M3-D4)', () => {
+  const plannerFiles = PLANNER_DIRS.flatMap((d) => walk(join(ROOT, d)));
+
+  it('finds the planner sources', () => {
+    expect(plannerFiles.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('planner modules never import the world or its truth, through any import chain', () => {
+    const violations: string[] = [];
+    for (const start of plannerFiles) {
+      const seen = new Set<string>();
+      const stack: { file: string; chain: string[] }[] = [{ file: start, chain: [] }];
+      while (stack.length > 0) {
+        const { file, chain } = stack.pop()!;
+        if (seen.has(file)) continue;
+        seen.add(file);
+        const rel = relative(ROOT, file).replace(/\\/g, '/');
+        if (TRUTH_FILES.some((t) => (t.endsWith('/') ? rel.startsWith(t) : rel === t))) {
+          violations.push([...chain, rel].join(' → '));
+          continue;
+        }
+        for (const spec of importsOf(file)) {
+          const local = resolveLocal(file, spec);
+          if (local) stack.push({ file: local, chain: [...chain, rel] });
+        }
+      }
+    }
+    expect(violations).toEqual([]);
+  });
+});

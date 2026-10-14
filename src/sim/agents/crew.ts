@@ -1,4 +1,4 @@
-import { notImplemented } from '../../shared/not-implemented';
+import { IllegalTransitionError } from './fsm';
 
 export type CrewState =
   | { readonly kind: 'Idle' }
@@ -19,5 +19,17 @@ export type CrewInput =
  * - anything else throws IllegalTransitionError
  */
 export function crewNext(state: CrewState, input: CrewInput): CrewState {
-  return notImplemented('crewNext', state, input);
+  const illegal = (): never => {
+    throw new IllegalTransitionError('clearance crew', state.kind, input.kind);
+  };
+  switch (input.kind) {
+    case 'Dispatch':
+      return state.kind === 'Idle' ? { kind: 'ToBlackSpot', blackSpotId: input.blackSpotId } : illegal();
+    case 'Arrived':
+      return state.kind === 'ToBlackSpot' ? { kind: 'Clearing', blackSpotId: state.blackSpotId } : illegal();
+    case 'ClearingDone':
+      return state.kind === 'Clearing' ? { kind: 'ToDisposal' } : illegal();
+    case 'Unloaded':
+      return state.kind === 'ToDisposal' ? { kind: 'Idle' } : illegal();
+  }
 }

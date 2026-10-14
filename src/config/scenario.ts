@@ -11,6 +11,8 @@ export interface Levers {
   readonly breakdownChancePerShift: number;
   /** Chance a stop is skipped by a non-compliant driver, 0–1 (S-5). */
   readonly skipChance: number;
+  /** M3-D2: chance per tipper per day of ending the shift early, at a uniform time in its second half (S-5). Default 0. */
+  readonly earlyReturnChance?: number;
 }
 
 /** A complete, reproducible run description (SC-4). */

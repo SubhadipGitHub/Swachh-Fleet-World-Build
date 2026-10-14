@@ -24,7 +24,9 @@ function buildOnlyCsp(): Plugin {
 
 export default defineConfig({
   plugins: [preact(), viteSingleFile(), buildOnlyCsp()],
-  build: { target: 'es2022', assetsInlineLimit: Number.MAX_SAFE_INTEGER, cssCodeSplit: false },
+  // The map snapshot's binary files are imported as inline data (AD-3); the build never fetches anything.
+  assetsInclude: ['**/*.bin'],
+  build: { target: 'es2022', assetsInlineLimit: Number.MAX_SAFE_INTEGER, cssCodeSplit: false, chunkSizeWarningLimit: 16_000 },
   worker: { format: 'es' },
   test: {
     include: [

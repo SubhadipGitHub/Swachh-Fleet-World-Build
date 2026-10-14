@@ -17,6 +17,12 @@ describe('blackSpotNext', () => {
     expect(blackSpotNext(s, { kind: 'Cleared' })).toEqual({ kind: 'Dormant' });
   });
 
+  it('loses part of its waste to leakage (M3-D2), never below zero', () => {
+    expect(blackSpotNext({ kind: 'Active', sizeKg: 100 }, { kind: 'Leak', kg: 30 })).toEqual({ kind: 'Active', sizeKg: 70 });
+    expect(() => blackSpotNext({ kind: 'Active', sizeKg: 10 }, { kind: 'Leak', kg: 11 })).toThrow(RangeError);
+    expect(() => blackSpotNext({ kind: 'Clearing', sizeKg: 10 }, { kind: 'Leak', kg: 1 })).toThrow(IllegalTransitionError);
+  });
+
   it('rejects negative growth', () => {
     expect(() => blackSpotNext({ kind: 'Active', sizeKg: 5 }, { kind: 'Grow', kg: -1 })).toThrow(RangeError);
   });

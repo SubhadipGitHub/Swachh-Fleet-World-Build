@@ -55,6 +55,12 @@ A bounding box around the cluster (12.893–12.945 N, 77.608–77.660 E, ~32 km�
 | Drivable roads (motorway…living_street incl. service) | 6,262 ways | Road graph of roughly 15–20k directed edges after splitting at junctions |
 | …tagged `oneway=yes` | 771 | One-way rules respected in routing |
 
+**Committed snapshot `data/snapshot/2026-10-14/`** (fetched by `npm run data:fetch`, kept to within 300 m of the 7
+wards): **26,199 buildings** (1.1% with `building:levels`), **3,460 road ways / 10,753 nodes**, 126 water and park
+areas, 860 POIs (KCDC 1, recycling centres 2, marketplaces 3, named places 41, shops 813). Data files 1.1 MB.
+Coverage report: **South-69 Hosapalya is sparse** (building density under 30% of the cluster median; it holds KCDC and
+open land), so it is flagged rather than filled in (R-2).
+
 The public Overpass servers often time out on area queries. The fetch script uses bounding-box queries, retries
 with backoff, and falls back to mirrors (architecture AD-3).
 
@@ -152,6 +158,59 @@ Each `assumed` figure in the config has a note. The main ones:
 | Free-flow reference speed | 30 km/h | Uncongested urban arterial speed the TomTom averages are compared with |
 | Free speed and lanes by road class | `src/routing/graph.ts` | Used where OSM lacks `maxspeed` or `lanes` |
 | Daily generation profiles | household morning peak; market evening peak | Shape only; the daily totals come from the per-capita rate |
+| Auto-tipper payload | 1,000 kg | Typical auto-tipper |
+| Door-to-door service time | 10 s per household (min 20 s per street) | ~1,000 households served in a 06:00–11:00 beat |
+| Smart-bin service time | 60 s | Lift and tip one bin |
+| Tipping at a transfer point | 5 min | Hand-over to the container |
+| Compactor load / weigh / unload | 10 / 2 / 10 min | Typical yard times |
+| Compactor slots | 09:30, 12:00, 14:30, 17:00 (staggered 10 min) | Today's fixed schedule (static policy) |
+| Shifts | Auto-tippers 06:00–14:00; compactors 07:00–19:00 | L-1 |
+| Clearance crews | 2 crews, dispatched 14:00–18:00, waste to the landfill | Black-spot waste is mixed, so it goes to landfill |
+| Off-map trip to Mittaganahalli | 4,300 s each way | ~30 km at ~25 km/h |
+| Breakdown repair | 45–120 min | |
+| Black-spot dumping | 50% of the spot's streets' waste on activation, 25% an hour while active; pressure 0.0002/h of backlog, 0.004 per skip | Waste from unserved streets ends up at the spot |
+| Sensor faults | 0.05% of readings fail; 1% of failed readings recover; noise sd 3 points | Ultrasonic sensors |
+| Bin sizes and inflow | Market 240 kg / 120 kg a day; commercial 120 / 50; transfer-point container 6,000 (about one compactor load, tipped waste included) / 30; black-spot bin 120 / 40 | |
+| Fuel | Auto-tipper 0.083 L/km, compactor 0.4 L/km, crew lorry 0.3 L/km, +15% idling | |
+| Monsoon generation | +9% by weight (60% wet × 15%) | X-1 |
+| Lane width | 2.8 m; drawn left of the centre line | India keeps left |
+| Diesel price (M2) | ₹89 per litre | Approximate Bengaluru retail price for the ₹ fuel sub-line; *to source* |
+| Flood-prone spots (M2) | Up to 12 road nodes within 120 m of water; edges within 40 m close in a monsoon | No public waterlogging list found for the cluster |
+| Night clearance (M2) | Crews dispatched 19:00–21:00 | X-2 night clearance, finishing before midnight |
+| Heatwave (M2) | Overflow threshold 90%; black-spot pressure × 1.5 | X-1 |
+| Monsoon sensors (M2) | 3% of sensors go offline when the downpour starts | X-1 |
+| Tables ETA (M2) | Remaining walk ÷ 12 km/h plus remaining service time | Typical beat speed |
+| Waste variability (M3) | Each street's and bin's daily waste × a lognormal multiplier, mean 1, σ 0.2 (keyed per street and day) | M3-D2: forecasts must not learn the generator exactly |
+| Breakdowns (M3) | 1% of vehicle shifts | About one tipper in a hundred a day; not calibrated |
+| Early returns (M3) | Half as likely as a skipped street; at a uniform time in the second half of the shift | M3-D2 non-compliance, calibrated with the skip chance (see "Calibrated baseline") |
+| Dumping (M3) | Waste on a street unserved over 48 h moves to the nearest black spot within 500 m, 10% an hour | M3-D2 |
+| Planner estimates (M3) | Straight line × 1.35 at 12 km/h for tippers, × 1.35 at 20 km/h for compactors | Route-time estimates inside the planner; actual driving uses the road network |
+| Street priority (M3) | Weights: backlog 1, days since served 1, black-spot risk 0.5 (risk 1 next to an active spot, 0.3 a dormant one); "Backlog" reason above 1.2 days of waste | M3-11; editable in the M4 lab |
+| Compactor dispatch (M3) | Sent when a transfer point is forecast to reach 80% by arrival; a tipper due counts as 16.7 points | M3-D7 |
+| Clearance crews (M3) | Risk = size + 6 × growth per hour + 0.25 × nearby backlog (× 1.5 in a heatwave); daytime dispatch at 1,500 kg or more | M3-D8 |
+| Forecasting (M3) | Hour-of-week profile, smoothing α 0.3; r̂ (kg per household per day) smoothing α 0.3 from weigh-ins | M3-D5 |
+| Planning (M3) | Cut-off 05:00, plan at 05:30; incident re-plans 300 s after the incident with the broken tipper and its 3 nearest tippers on shift; budgets 150,000 / 30,000 local-search moves | M3-D9 |
+
+## Calibrated baseline (M3-D3)
+
+The Static baseline is tuned to the B.PAC 2023 figure (`bpac-2023-collection`, "< 60% collected"), with
+`scripts/calibrate.ts`:
+- **Measure:** the share of generated waste collected (tippers, smart bins and crews) on days 3–7, in clear weather,
+  mean of 5 seeds.
+- **Tune:** a non-compliance intensity *k*. The skip chance is *k*; the early-return chance is *k* ÷ 2 (an
+  `assumed` ratio). *k* is bisected towards **55%**, the middle of the 50–60% band.
+- **Then:** the smallest leakage share (in steps of 0.05) for which the backlog levels off (day-7 backlog at most
+  1.05 × day-5), and *k* again at that share.
+- Figures that are not tuned: the 5% absence rate (`derived` from the city figure) and the breakdown chance.
+
+| Figure | Value | Tag |
+|---|---|---|
+| Streets skipped by drivers (*k*) | 0.373 (37.3% of street visits) | `derived` (calibrated) |
+| Shifts ended early (*k* ÷ 2) | 0.1865 (18.65% of tipper shifts) | `derived` (calibrated) |
+| Stale backlog leaving the system each day (streets over 48 h and active black spots) | 0.45 a day | `derived` (calibrated) |
+| Result: collected, days 3–7, 5 seeds | 55.07% (backlog day 7 ÷ day 5: 1.045) | `synthetic` (the calibrated model's output) |
+
+`tests/perf/baseline-band.perf.test.ts` re-checks the band on 3 seeds.
 
 ## Sources
 

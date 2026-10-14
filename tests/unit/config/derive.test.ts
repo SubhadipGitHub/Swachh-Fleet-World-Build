@@ -42,6 +42,18 @@ const CAL: Calibration = {
   freeFlowRefSpeedKmh: fig(30, 'km/h', 'assumed', ['kasaflow-assumptions']),
   morningPeakSpeedKmh: fig(14.6, 'km/h', 'real', ['tomtom-2025']),
   eveningPeakSpeedKmh: fig(13.2, 'km/h', 'real', ['tomtom-2025']),
+  dieselPriceInrPerL: fig(89, 'INR/L', 'assumed', ['kasaflow-assumptions']),
+  skipChance: fig(0.3, 'fraction', 'derived', ['bpac-2023-collection']),
+  earlyReturnChance: fig(0.15, 'fraction', 'derived', ['bpac-2023-collection']),
+  leakageSharePerDay: fig(0.5, 'fraction', 'derived', ['bpac-2023-collection']),
+  breakdownChancePerShift: fig(0.01, 'fraction', 'assumed', ['kasaflow-assumptions']),
+  generationSigma: fig(0.2, 'factor', 'assumed', ['kasaflow-assumptions']),
+  dumpRadiusM: fig(500, 'm', 'assumed', ['kasaflow-assumptions']),
+  compactorDispatchPct: fig(80, '%', 'assumed', ['kasaflow-assumptions']),
+  criticalSpotKg: fig(1500, 'kg', 'assumed', ['kasaflow-assumptions']),
+  priorityWeightBacklog: fig(1, 'weight', 'assumed', ['kasaflow-assumptions']),
+  priorityWeightAge: fig(1, 'weight', 'assumed', ['kasaflow-assumptions']),
+  priorityWeightRisk: fig(0.5, 'weight', 'assumed', ['kasaflow-assumptions']),
 };
 
 describe('deriveClusterScale (W-5)', () => {

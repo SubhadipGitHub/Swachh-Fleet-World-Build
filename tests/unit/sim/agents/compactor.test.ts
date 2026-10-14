@@ -18,6 +18,11 @@ const LEGAL: readonly [string, CompactorState, CompactorInput, CompactorState][]
   ['home', { kind: 'ToDepot' }, { kind: 'ArrivedAtDepot' }, { kind: 'OffShift' }],
   ['breaks down hauling', { kind: 'ToKCDC' }, { kind: 'Breakdown' }, { kind: 'BrokenDown', resume: { kind: 'ToKCDC' } }],
   ['repaired', { kind: 'BrokenDown', resume: { kind: 'ToLandfill' } }, { kind: 'Repaired' }, { kind: 'ToLandfill' }],
+  // M3-D7: Dynamic dispatch.
+  ['shift starts waiting for dispatch', { kind: 'OffShift' }, { kind: 'ShiftStart', wait: true }, { kind: 'Waiting' }],
+  ['dispatched', { kind: 'Waiting' }, { kind: 'Dispatch' }, { kind: 'ToTransferPoint' }],
+  ['unloaded, waits for the next dispatch', { kind: 'Unloading', site: 'KCDC' }, { kind: 'UnloadDone', moreRuns: true, wait: true }, { kind: 'Waiting' }],
+  ['sent home while waiting', { kind: 'Waiting' }, { kind: 'GoHome' }, { kind: 'ToDepot' }],
 ];
 
 const ILLEGAL: readonly [CompactorState, CompactorInput][] = [
@@ -27,6 +32,9 @@ const ILLEGAL: readonly [CompactorState, CompactorInput][] = [
   [{ kind: 'Weighing' }, { kind: 'ArrivedAtLandfill' }],
   [{ kind: 'ToKCDC' }, { kind: 'Weighed', diverted: false }],
   [{ kind: 'Unloading', site: 'KCDC' }, { kind: 'ArrivedAtDepot' }],
+  [{ kind: 'Waiting' }, { kind: 'Breakdown' }],
+  [{ kind: 'ToKCDC' }, { kind: 'Dispatch' }],
+  [{ kind: 'OffShift' }, { kind: 'GoHome' }],
 ];
 
 describe('compactorNext', () => {

@@ -9,7 +9,7 @@ export interface DebugApi {
   drawCalls(): number;
   /** Jumps the live sim to hh:mm IST today (or tomorrow if already past) and resolves once that frame is shown. */
   skipTo(hhmm: string): Promise<void>;
-  /** Display ids of vehicles currently on the map, e.g. "AT-HSR-031". */
+  /** Display ids of on-screen vehicles a click at their position would select, most isolated first, e.g. "AT-HSR-031". */
   vehicleIds(): string[];
   /** Screen position (CSS pixels from the canvas's top-left) of an object, or null if off screen. */
   screenPositionOf(displayId: string): { readonly x: number; readonly y: number } | null;
@@ -17,6 +17,12 @@ export interface DebugApi {
   emptyGroundPoint(): { readonly x: number; readonly y: number } | null;
   /** Display id of the selected object, or null. */
   selectedId(): string | null;
+  /** M2: the lighting phase on screen and the day/night override. */
+  lighting(): { readonly phase: 'day' | 'twilight' | 'night'; readonly override: 'auto' | 'day' | 'night' };
+  /** M2: the live weather mode. */
+  weather(): string;
+  /** CR-2: place labels at least half faded in and on screen, at their card centres (canvas CSS pixels). */
+  labels(): readonly { readonly group: 'area' | 'ward' | 'facility'; readonly text: string; readonly x: number; readonly y: number }[];
 }
 
 declare global {
